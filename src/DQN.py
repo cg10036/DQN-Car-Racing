@@ -31,7 +31,7 @@ class DQN:
         self.optimizer = torch.optim.RMSprop(self.network.parameters(), lr)
 
         self.buffer = ReplayBuffer(state_dim, (1,), buffer_size)
-        self.device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.network.to(self.device)
         self.target_network.to(self.device)
 
@@ -55,7 +55,7 @@ class DQN:
         next_q = self.target_network(s_prime).detach()
 
         ###############  Write Code #################
-        td_target = r + (1. - terminated) *
+        td_target = r + (1. - terminated) * self.gamma * next_q.max(dim=1)[0].unsqueeze(1)
         #############################################
 
         loss = F.mse_loss(self.network(s).gather(1, a.long()), td_target)
@@ -98,10 +98,10 @@ class ReplayBuffer:
     def update(self, s, a, r, s_prime, terminated):
 
         ############### Write Code ##########################
-        self.s[self.ptr] =
-        self.a[self.ptr] =
-        self.r[self.ptr] =
-        self.s_prime[self.ptr] =
+        self.s[self.ptr] = s
+        self.a[self.ptr] = a
+        self.r[self.ptr] = r
+        self.s_prime[self.ptr] = s_prime
         self.terminated[self.ptr] = terminated
         ######################################################
 
